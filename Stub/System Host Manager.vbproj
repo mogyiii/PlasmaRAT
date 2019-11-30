@@ -148,6 +148,7 @@
     <Compile Include="Tor\Connect.vb" />
     <Compile Include="Tor\Create.vb" />
     <Compile Include="Tor\Install.vb" />
+    <Compile Include="Tor\Start.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
