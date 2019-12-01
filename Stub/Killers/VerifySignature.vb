@@ -1,3 +1,0 @@
-﻿Module VerifySignature
-
-End Module
